@@ -9,6 +9,8 @@ Swift + SwiftUI — no Electron, no external runtimes.
 
 ## ContainerDeck vs Docker Desktop
 
+![Docker Desktop vs ContainerDeck architecture](docs/architecture.png)
+
 The difference is first of all architectural. Docker Desktop runs every
 container inside **a single always-on Linux VM** (with GBs of RAM reserved
 even when idle). apple/container instead spins up **a dedicated micro-VM per
