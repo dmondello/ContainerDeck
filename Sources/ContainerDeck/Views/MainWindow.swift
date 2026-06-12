@@ -3,6 +3,7 @@ import SwiftUI
 enum SidebarSection: String, CaseIterable, Identifiable {
     case dashboard = "Dashboard"
     case containers = "Container"
+    case stacks = "Stack"
     case images = "Immagini"
     case volumes = "Volumi"
     case settings = "Impostazioni"
@@ -16,6 +17,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         switch self {
         case .dashboard: return "gauge.with.dots.needle.50percent"
         case .containers: return "shippingbox"
+        case .stacks: return "square.stack.3d.up"
         case .images: return "opticaldisc"
         case .volumes: return "externaldrive"
         case .settings: return "gearshape"
@@ -36,6 +38,7 @@ struct MainWindow: View {
                 switch selection ?? .dashboard {
                 case .dashboard: DashboardView()
                 case .containers: ContainersListView()
+                case .stacks: StacksView()
                 case .images: ImagesView()
                 case .volumes: VolumesView()
                 case .settings: SettingsView()

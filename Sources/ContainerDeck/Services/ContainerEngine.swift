@@ -22,6 +22,8 @@ protocol ContainerEngine: Sendable {
 
     func pullImage(_ reference: String) async throws
     func deleteImage(_ reference: String) async throws
+    /// Costruisce un'immagine da un Dockerfile (richiede il builder BuildKit).
+    func buildImage(tag: String, contextDir: String, dockerfile: String?, target: String?) async throws
 
     func createVolume(_ name: String) async throws
     func deleteVolume(_ name: String) async throws
@@ -137,6 +139,20 @@ struct ContainerCLIService: ContainerEngine {
 
     func deleteImage(_ reference: String) async throws {
         _ = try await run(["image", "delete", reference])
+    }
+
+    func buildImage(tag: String, contextDir: String, dockerfile: String?, target: String?) async throws {
+        var args = ["build", "--tag", tag]
+        if let dockerfile { args += ["--file", dockerfile] }
+        if let target { args += ["--target", target] }
+        args.append(contextDir)
+        do {
+            _ = try await run(args)
+        } catch {
+            // Primo uso: il builder BuildKit potrebbe non essere avviato.
+            _ = try? await run(["builder", "start"])
+            _ = try await run(args)
+        }
     }
 
     // MARK: Volumi

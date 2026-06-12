@@ -102,6 +102,11 @@ final class MockEngine: ContainerEngine, @unchecked Sendable {
         mutate { $0.images.removeAll { $0.reference == reference } }
     }
 
+    func buildImage(tag: String, contextDir: String, dockerfile: String?, target: String?) async throws {
+        try await Task.sleep(for: .seconds(1))
+        mutate { $0.images.append(DeckImage(reference: tag, sizeBytes: 120 << 20)) }
+    }
+
     func createVolume(_ name: String) async throws {
         mutate { $0.volumes.append(DeckVolume(name: name, sizeBytes: 0)) }
     }

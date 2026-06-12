@@ -210,6 +210,31 @@ extension Localizer {
         "Esecuzione…": "Running…",
         "Informazioni": "About",
         "Versione app": "App version",
-        "Progetto runtime": "Runtime project"
+        "Progetto runtime": "Runtime project",
+
+        // Stack (compose)
+        "Stack": "Stacks",
+        "Apri compose…": "Open compose…",
+        "Nessuno stack caricato": "No stack loaded",
+        "Apri un docker-compose.yml per orchestrare più container insieme.":
+            "Open a docker-compose.yml to orchestrate multiple containers together.",
+        "Avvia stack": "Start stack",
+        "Ferma stack": "Stop stack",
+        "Rimuovi stack": "Tear down stack",
+        "Servizio": "Service",
+        "Origine": "Source",
+        "Nome container": "Container name",
+        "Porte": "Ports",
+        "Non creato": "Not created",
+        "Avvio dello stack “%@”…": "Starting stack “%@”…",
+        "Arresto dello stack…": "Stopping stack…",
+        "Rimozione dei container dello stack…": "Removing stack containers…",
+        "Eliminare i container dello stack “%@”?": "Delete the containers of stack “%@”?",
+        "I volumi nominati non vengono eliminati.": "Named volumes are not deleted.",
+        "Build di %@…": "Building %@…",
+        "Volume %@ creato": "Volume %@ created",
+        "Volume %@ già presente": "Volume %@ already exists",
+        "Avvio interrotto: i servizi dipendenti non sono stati avviati.":
+            "Startup aborted: dependent services were not started."
     ]
 }

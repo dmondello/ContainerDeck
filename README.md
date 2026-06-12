@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.1.0-blue)
+![status](https://img.shields.io/badge/version-0.2.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## ContainerDeck vs Docker Desktop
@@ -36,6 +36,27 @@ maturity. apple/container is at 1.0 and requires macOS 15+ on Apple Silicon
 (macOS 26 for the advanced networking features). The two tools coexist on
 the same machine without conflicts: lightweight local development →
 ContainerDeck; complex multi-container orchestration → Docker Desktop.
+
+## Stacks: docker-compose support
+
+apple/container has no native compose equivalent — ContainerDeck fills the
+gap. The **Stacks** section imports a `docker-compose.yml` and orchestrates
+it on the runtime:
+
+- **Supported subset**: `services` (image / build context+target+dockerfile /
+  command / ports / environment / volumes / depends_on / container_name),
+  top-level named `volumes`, `${VAR}` and `${VAR:-default}` interpolation
+  from a sibling `.env` file and the process environment.
+- **Start order** follows `depends_on` (topological sort); builds run through
+  `container build` (BuildKit), named volumes are created on the fly.
+- **Ignored with a warning**: `restart` and `healthcheck` (not supported by
+  the runtime), system socket mounts like `/var/run/docker.sock` (does not
+  exist on apple/container), mount options such as `:ro`.
+- **Service discovery caveat**: containers don't resolve each other by
+  service name out of the box — each container gets a dedicated IP instead.
+  Use `container system dns create` for name resolution, or point services
+  at container IPs.
+- Up / Stop / Tear down from the toolbar; tear down keeps named volumes.
 
 ## Requirements
 
@@ -88,6 +109,7 @@ Sources/ContainerDeck/
 │   ├── DeckContainer.swift     Container + NewContainerSpec (→ container run)
 │   ├── DeckImage.swift         Local OCI images
 │   ├── DeckVolume.swift        Named volumes
+│   ├── ComposeStack.swift      docker-compose parser (Stacks feature)
 │   └── EngineTypes.swift       EngineStatus, ContainerStats, formatters
 ├── Services/
 │   ├── ContainerEngine.swift   Protocol + real CLI implementation
@@ -102,6 +124,7 @@ Sources/ContainerDeck/
     ├── MainWindow.swift        NavigationSplitView + sidebar + engine status
     ├── DashboardView.swift     Summary cards, error/engine banners
     ├── ContainersListView.swift  Filterable table + quick actions
+    ├── StacksView.swift        Compose import + stack orchestration
     ├── ContainerDetailView.swift Overview / Logs / Inspector + shell
     ├── LogViewer.swift         Live streaming, filter, copy
     ├── ImagesView.swift        List + pull + delete images
@@ -119,7 +142,9 @@ Principles:
   contract across releases; every field is looked up through multiple paths
   and degrades to "—" instead of breaking. The *Inspector* tab always shows
   the raw JSON for debugging.
-- **Zero external dependencies**: just SwiftUI, Foundation and Observation.
+- **One external dependency**: [Yams](https://github.com/jpsim/Yams) for
+  YAML parsing (Stacks feature) — everything else is SwiftUI, Foundation
+  and Observation.
 
 ## Localization
 
