@@ -5,6 +5,11 @@ struct ContainersListView: View {
     @State private var filter = ""
     @State private var showCreateSheet = false
     @State private var containerToDelete: DeckContainer?
+    @State private var showCombinedLogs = false
+
+    private var runningIDs: [String] {
+        appState.containers.filter { $0.state == .running }.map(\.id)
+    }
 
     private var filtered: [DeckContainer] {
         guard !filter.isEmpty else { return appState.containers }
@@ -36,7 +41,14 @@ struct ContainersListView: View {
         }
         .searchable(text: $filter, placement: .toolbar, prompt: L("Filtra per nome o immagine"))
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    showCombinedLogs = true
+                } label: {
+                    Label(L("Log combinati"), systemImage: "doc.text.magnifyingglass")
+                }
+                .disabled(runningIDs.isEmpty)
+                .help(L("Log combinati di tutti i container in esecuzione"))
                 Button {
                     showCreateSheet = true
                 } label: {
@@ -44,6 +56,9 @@ struct ContainersListView: View {
                 }
                 .help(L("Crea un nuovo container"))
             }
+        }
+        .sheet(isPresented: $showCombinedLogs) {
+            MultiLogView(containerIDs: runningIDs)
         }
         .sheet(isPresented: $showCreateSheet) {
             CreateContainerSheet()

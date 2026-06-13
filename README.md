@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.3.0-blue)
+![status](https://img.shields.io/badge/version-0.4.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## ContainerDeck vs Docker Desktop
@@ -36,6 +36,15 @@ maturity. apple/container is at 1.0 and requires macOS 15+ on Apple Silicon
 (macOS 26 for the advanced networking features). The two tools coexist on
 the same machine without conflicts: lightweight local development →
 ContainerDeck; complex multi-container orchestration → Docker Desktop.
+
+## Features
+
+Dashboard · containers (create / start / stop / restart / delete, detail with
+live stats, env, mounts, raw JSON) · **Stacks** (docker-compose import with
+service discovery) · images (pull / delete / create container) · volumes ·
+**networks** · **combined multi-container log viewer** (color-coded, filter,
+per-container toggle) · per-container live logs and shell · English/Italian
+with live switching · light/dark theme · Demo mode without a runtime.
 
 ## Stacks: docker-compose support
 
@@ -114,6 +123,7 @@ Sources/ContainerDeck/
 │   ├── DeckContainer.swift     Container + NewContainerSpec (→ container run)
 │   ├── DeckImage.swift         Local OCI images
 │   ├── DeckVolume.swift        Named volumes
+│   ├── DeckNetwork.swift       Container networks
 │   ├── ComposeStack.swift      docker-compose parser (Stacks feature)
 │   └── EngineTypes.swift       EngineStatus, ContainerStats, formatters
 ├── Services/
@@ -132,6 +142,8 @@ Sources/ContainerDeck/
     ├── StacksView.swift        Compose import + stack orchestration
     ├── ContainerDetailView.swift Overview / Logs / Inspector + shell
     ├── LogViewer.swift         Live streaming, filter, copy
+    ├── MultiLogView.swift      Combined logs of many containers, color-coded
+    ├── NetworksView.swift      List/create/delete container networks
     ├── ImagesView.swift        List + pull + delete images
     ├── VolumesView.swift       List + create + delete volumes
     ├── SettingsView.swift      CLI path, language, theme, polling, demo, diagnostics

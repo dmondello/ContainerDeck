@@ -246,6 +246,32 @@ extension Localizer {
             "On start, services are made reachable by name via /etc/hosts",
         "Configurazione service discovery (/etc/hosts)…":
             "Wiring service discovery (/etc/hosts)…",
-        "Service discovery attivo: %@": "Service discovery active: %@"
+        "Service discovery attivo: %@": "Service discovery active: %@",
+
+        // Multi-log
+        "Log": "Logs",
+        "Log combinati": "Combined logs",
+        "Log combinati (%d container)": "Combined logs (%d containers)",
+        "Log combinati dei servizi in esecuzione": "Combined logs of running services",
+        "Log combinati di tutti i container in esecuzione": "Combined logs of all running containers",
+        "Chiudi": "Close",
+        "Mostra": "Show",
+        "Nascondi": "Hide",
+
+        // Reti
+        "Reti": "Networks",
+        "Nessuna rete": "No networks",
+        "Crea una rete per isolare gruppi di container (richiede macOS 26).":
+            "Create a network to isolate groups of containers (requires macOS 26).",
+        "predefinita": "default",
+        "Modalità": "Mode",
+        "Subnet": "Subnet",
+        "Gateway": "Gateway",
+        "La rete predefinita non è eliminabile": "The default network cannot be deleted",
+        "Elimina rete": "Delete network",
+        "Nuova rete": "New network",
+        "Nome rete": "Network name",
+        "Le reti richiedono macOS 26.": "Networks require macOS 26.",
+        "Eliminare la rete “%@”?": "Delete network “%@”?"
     ]
 }

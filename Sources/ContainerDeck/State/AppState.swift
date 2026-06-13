@@ -10,6 +10,7 @@ final class AppState {
     var containers: [DeckContainer] = []
     var images: [DeckImage] = []
     var volumes: [DeckVolume] = []
+    var networks: [DeckNetwork] = []
     var stats: [String: ContainerStats] = [:]
     var diskUsageBytes: Int64?
     var lastError: String?
@@ -71,6 +72,8 @@ final class AppState {
             containers = try await containersTask
             images = try await imagesTask
             volumes = try await volumesTask
+            // Le reti richiedono macOS 26: best-effort, non devono far fallire il resto.
+            networks = (try? await engine.listNetworks()) ?? networks
             lastError = nil
         } catch {
             lastError = error.localizedDescription
@@ -171,6 +174,30 @@ final class AppState {
     func createVolume(_ name: String) async throws {
         try await engine.createVolume(name)
         await refreshAll()
+    }
+
+    func createNetwork(_ name: String) async throws {
+        try await engine.createNetwork(name)
+        await refreshAll()
+    }
+
+    func deleteNetwork(_ name: String) async {
+        do {
+            try await engine.deleteNetwork(name)
+            lastError = nil
+        } catch {
+            lastError = error.localizedDescription
+        }
+        await refreshAll()
+    }
+
+    /// Container collegati a una rete (incrocio sugli indirizzi del subnet).
+    func containersOn(network: DeckNetwork) -> [DeckContainer] {
+        guard let subnet = network.subnet?.split(separator: "/").first else { return [] }
+        let prefix = subnet.split(separator: ".").prefix(3).joined(separator: ".")
+        return containers.filter { container in
+            container.addresses.contains { $0.hasPrefix(prefix + ".") }
+        }
     }
 
     func deleteVolume(_ name: String) async {

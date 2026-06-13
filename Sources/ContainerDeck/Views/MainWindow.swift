@@ -6,6 +6,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
     case stacks = "Stack"
     case images = "Immagini"
     case volumes = "Volumi"
+    case networks = "Reti"
     case settings = "Impostazioni"
 
     var id: String { rawValue }
@@ -20,6 +21,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         case .stacks: return "square.stack.3d.up"
         case .images: return "opticaldisc"
         case .volumes: return "externaldrive"
+        case .networks: return "network"
         case .settings: return "gearshape"
         }
     }
@@ -41,6 +43,7 @@ struct MainWindow: View {
                 case .stacks: StacksView()
                 case .images: ImagesView()
                 case .volumes: VolumesView()
+                case .networks: NetworksView()
                 case .settings: SettingsView()
                 }
             }

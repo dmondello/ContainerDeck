@@ -68,6 +68,23 @@ final class MockEngine: ContainerEngine, @unchecked Sendable {
         sync { $0.volumes }
     }
 
+    private var networks: [DeckNetwork] = [
+        DeckNetwork(id: "default", mode: "nat", subnet: "192.168.64.0/24",
+                    gateway: "192.168.64.1", isBuiltin: true)
+    ]
+
+    func listNetworks() async throws -> [DeckNetwork] {
+        sync { $0.networks }
+    }
+
+    func createNetwork(_ name: String) async throws {
+        mutate { $0.networks.append(DeckNetwork(id: name, mode: "nat", subnet: "192.168.66.0/24")) }
+    }
+
+    func deleteNetwork(_ name: String) async throws {
+        mutate { $0.networks.removeAll { $0.id == name && !$0.isBuiltin } }
+    }
+
     func stats() async throws -> [ContainerStats] {
         sync { engine in
             engine.containers.filter { $0.state == .running }.enumerated().map { i, c in

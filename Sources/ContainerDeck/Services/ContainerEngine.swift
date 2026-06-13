@@ -11,6 +11,7 @@ protocol ContainerEngine: Sendable {
     func listContainers() async throws -> [DeckContainer]
     func listImages() async throws -> [DeckImage]
     func listVolumes() async throws -> [DeckVolume]
+    func listNetworks() async throws -> [DeckNetwork]
     func stats() async throws -> [ContainerStats]
     func diskUsageBytes() async throws -> Int64?
 
@@ -27,6 +28,10 @@ protocol ContainerEngine: Sendable {
 
     func createVolume(_ name: String) async throws
     func deleteVolume(_ name: String) async throws
+
+    /// Reti richiedono macOS 26: create/delete possono fallire su 15.
+    func createNetwork(_ name: String) async throws
+    func deleteNetwork(_ name: String) async throws
 
     /// Esegue un comando dentro un container in esecuzione (`container exec`).
     /// Usato per il service discovery: iniezione di voci in /etc/hosts.
@@ -95,6 +100,10 @@ struct ContainerCLIService: ContainerEngine {
 
     func listVolumes() async throws -> [DeckVolume] {
         try await records(["volume", "list", "--format", "json"]).map(DeckVolume.init)
+    }
+
+    func listNetworks() async throws -> [DeckNetwork] {
+        try await records(["network", "list", "--format", "json"]).map(DeckNetwork.init)
     }
 
     func stats() async throws -> [ContainerStats] {
@@ -167,6 +176,14 @@ struct ContainerCLIService: ContainerEngine {
 
     func deleteVolume(_ name: String) async throws {
         _ = try await run(["volume", "delete", name])
+    }
+
+    func createNetwork(_ name: String) async throws {
+        _ = try await run(["network", "create", name])
+    }
+
+    func deleteNetwork(_ name: String) async throws {
+        _ = try await run(["network", "delete", name])
     }
 
     func exec(id: String, command: [String]) async throws {

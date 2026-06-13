@@ -7,6 +7,15 @@ struct StacksView: View {
     @Environment(AppState.self) private var appState
     @State private var showImporter = false
     @State private var confirmDown = false
+    @State private var showLogs = false
+
+    /// ID dei container dei servizi attualmente in esecuzione.
+    private var runningServiceContainers: [String] {
+        guard let stack = appState.stack else { return [] }
+        return stack.services
+            .map { $0.containerName(project: stack.name) }
+            .filter { id in appState.containers.first { $0.id == id }?.state == .running }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -44,6 +53,13 @@ struct StacksView: View {
                     }
                     .disabled(appState.isStackBusy)
                     Button {
+                        showLogs = true
+                    } label: {
+                        Label(L("Log"), systemImage: "doc.text.magnifyingglass")
+                    }
+                    .disabled(runningServiceContainers.isEmpty)
+                    .help(L("Log combinati dei servizi in esecuzione"))
+                    Button {
                         Task { await appState.stackStop() }
                     } label: {
                         Label(L("Ferma stack"), systemImage: "stop.fill")
@@ -65,6 +81,9 @@ struct StacksView: View {
             if case .success(let url) = result {
                 appState.loadStack(path: url.path)
             }
+        }
+        .sheet(isPresented: $showLogs) {
+            MultiLogView(containerIDs: runningServiceContainers)
         }
         .confirmationDialog(
             LF("Eliminare i container dello stack “%@”?", appState.stack?.name ?? ""),

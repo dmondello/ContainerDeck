@@ -104,7 +104,7 @@ struct SettingsView: View {
             }
 
             Section(L("Informazioni")) {
-                LabeledContent(L("Versione app"), value: "0.3.0")
+                LabeledContent(L("Versione app"), value: "0.4.0")
                 LabeledContent(L("Progetto runtime")) {
                     Link("github.com/apple/container",
                          destination: URL(string: "https://github.com/apple/container")!)
