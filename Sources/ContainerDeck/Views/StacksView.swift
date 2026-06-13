@@ -83,7 +83,7 @@ struct StacksView: View {
             }
         }
         .sheet(isPresented: $showLogs) {
-            MultiLogView(containerIDs: runningServiceContainers)
+            MultiLogView(containerIDs: runningServiceContainers).environment(appState)
         }
         .confirmationDialog(
             LF("Eliminare i container dello stack “%@”?", appState.stack?.name ?? ""),

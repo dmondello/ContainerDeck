@@ -24,7 +24,6 @@ struct ContainerTerminal: NSViewRepresentable {
 /// Alla chiusura il PTY si chiude e la shell riceve SIGHUP, terminando la
 /// sessione `exec`.
 struct ContainerTerminalSheet: View {
-    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
     let containerID: String
 

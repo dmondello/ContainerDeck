@@ -74,6 +74,7 @@ struct DashboardView: View {
                             .contentShape(Rectangle())
                             .contextMenu {
                                 ContainerContextMenuItems(container: container) { containerToDelete = $0 }
+                                    .environment(appState)
                             }
                             if container.id != appState.containers.prefix(6).last?.id {
                                 Divider()

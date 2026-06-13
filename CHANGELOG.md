@@ -4,6 +4,16 @@ All notable changes to ContainerDeck are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning while pre-1.0.
 
+## [0.5.1] — 2026-06-13
+
+### Fixed
+- Crash (`EXC_BREAKPOINT` in SwiftUI's environment subscript) when opening
+  the built-in terminal: `ContainerTerminalSheet` declared an unused
+  `@Environment(AppState.self)` that could be missing in the sheet's hosting
+  environment on macOS 26.3 / SwiftUI 7.3.2. Removed it, and defensively
+  injected the app environment into every sheet and container context menu
+  so detached AppKit hosting contexts always have it.
+
 ## [0.5.0] — 2026-06-13
 
 ### Added
@@ -83,6 +93,7 @@ semantic-ish versioning while pre-1.0.
 - English/Italian interface with live switching, light/dark theme, Demo mode.
 - App icon, Makefile targets for `.app` bundle and DMG packaging.
 
+[0.5.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.1
 [0.5.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.0
 [0.4.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.1
 [0.4.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.0

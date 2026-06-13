@@ -58,10 +58,10 @@ struct ContainersListView: View {
             }
         }
         .sheet(isPresented: $showCombinedLogs) {
-            MultiLogView(containerIDs: runningIDs)
+            MultiLogView(containerIDs: runningIDs).environment(appState)
         }
         .sheet(isPresented: $showCreateSheet) {
-            CreateContainerSheet()
+            CreateContainerSheet().environment(appState)
         }
         .confirmationDialog(
             LF("Eliminare il container “%@”?", containerToDelete?.id ?? ""),
@@ -130,6 +130,7 @@ struct ContainersListView: View {
             if let id = ids.first,
                let container = appState.containers.first(where: { $0.id == id }) {
                 ContainerContextMenuItems(container: container) { containerToDelete = $0 }
+                    .environment(appState)
             }
         }
     }

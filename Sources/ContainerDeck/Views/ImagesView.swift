@@ -105,9 +105,9 @@ struct ImagesView: View {
                 }
             }
         }
-        .sheet(isPresented: $showPullSheet) { PullImageSheet() }
+        .sheet(isPresented: $showPullSheet) { PullImageSheet().environment(appState) }
         .sheet(item: $imageForNewContainer) { image in
-            CreateContainerSheet(imageReference: image.reference)
+            CreateContainerSheet(imageReference: image.reference).environment(appState)
         }
         .confirmationDialog(
             LF("Eliminare l'immagine “%@”?", imageToDelete?.reference ?? ""),

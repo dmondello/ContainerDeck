@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.5.0-blue)
+![status](https://img.shields.io/badge/version-0.5.1-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## Download
