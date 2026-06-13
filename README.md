@@ -30,12 +30,15 @@ Apple Silicon.
 | Account/telemetry | required/present | none |
 | Images | OCI (Docker Hub, GHCR…) | OCI (the same images) |
 
-Where Docker Desktop is still ahead: **Docker Compose** (apple/container has
-no equivalent yet), built-in Kubernetes, extensions, and ten years of
-maturity. apple/container is at 1.0 and requires macOS 15+ on Apple Silicon
-(macOS 26 for the advanced networking features). The two tools coexist on
-the same machine without conflicts: lightweight local development →
-ContainerDeck; complex multi-container orchestration → Docker Desktop.
+ContainerDeck narrows the classic gap: apple/container has no native compose,
+so the app brings its own **Stacks** (a useful docker-compose subset, with
+service discovery — see below). Where Docker Desktop is still ahead: the
+**full** Compose spec (profiles, multiple networks, build secrets…), built-in
+Kubernetes, extensions, and ten years of maturity. apple/container is at 1.0
+and requires macOS 15+ on Apple Silicon (macOS 26 for the advanced networking
+features). The two tools coexist on the same machine without conflicts:
+lightweight local development → ContainerDeck; complex production-parity
+orchestration → Docker Desktop.
 
 ## Features
 
@@ -170,12 +173,55 @@ Settings → Interface → Language, with no restart. Strings go through a tiny
 `L()`/`LF()` layer (`Services/Localization.swift`); adding a language means
 adding one dictionary.
 
-## Known limitations (v0.1)
+## Known limitations
 
-- JSON schemas are verified against CLI **1.0.0**; future versions may need
-  new fallback paths in the models.
+- Integration is through the `container` **CLI** (`--format json`), not the
+  native XPC API yet — see the roadmap. JSON schemas are verified against CLI
+  **1.0.0**; future versions may need new fallback paths in the models.
+- **Stacks** cover a subset of compose (see above); `restart`, `healthcheck`,
+  profiles and per-stack networks are not handled. Service discovery via
+  `/etc/hosts` requires service names to be unique across stacks running at
+  the same time, and isn't re-applied if a container is restarted on its own.
 - The CPU percentage is derived from the `cpuUsageUsec` delta between two
   samples: the first refresh after startup shows "—".
 - The integrated shell opens Terminal.app via AppleScript (requires the
   Automation permission on first use); an embedded terminal is on the roadmap.
-- No automatic updates yet (Sparkle is on the roadmap).
+- The DMG is not notarized, and there are no automatic updates yet.
+
+## Roadmap
+
+Pre-1.0, focused on depth where it differentiates (Stacks, native macOS feel)
+rather than chasing full Docker Desktop parity.
+
+### 0.5 — native integration & polish
+- Migrate the engine from the CLI to the **`ContainerAPIClient` XPC API**
+  behind the existing `ContainerEngine` protocol (faster, no process spawn,
+  structured errors). The protocol boundary already makes this a drop-in.
+- **Embedded terminal** (SwiftTerm) for `exec`, replacing the Terminal.app
+  hand-off.
+- **Sparkle** auto-updates with an appcast on GitHub Releases.
+- Re-apply stack `/etc/hosts` wiring automatically when a service restarts.
+
+### 0.6 — deeper Stacks & observability
+- Wider compose coverage: `env_file`, multiple `volumes`/bind options,
+  per-stack network, `profiles`, a `restart`-like supervise loop.
+- Per-service log tab inside the stack view (reusing the multi-log engine).
+- **Historical stats** with Swift Charts + a small SQLite store (CPU / memory /
+  network over time), beyond the current live snapshot.
+- Image **build from Dockerfile** with live progress, and registry search.
+
+### 1.0 — a shippable product
+- **Developer ID signing + notarization** and a **Homebrew cask**
+  (`brew install --cask containerdeck`) so it installs with no Gatekeeper step.
+- Onboarding that detects a missing runtime and offers to install/update it.
+- Menu-bar extra with quick actions; full keyboard navigation.
+
+### Later
+- Save and switch between multiple named stacks/projects.
+- Volume browser (inspect/copy files) and container file explorer.
+- Plugin points for custom registries and actions.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full history. Released builds are on
+the [Releases](https://github.com/dmondello/ContainerDeck/releases) page.
