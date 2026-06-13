@@ -115,15 +115,8 @@ final class MockEngine: ContainerEngine, @unchecked Sendable {
         mutate { $0.volumes.removeAll { $0.name == name } }
     }
 
-    private var dnsDomainList: [String] = []
-
-    func dnsDomains() async throws -> [String] {
-        sync { $0.dnsDomainList }
-    }
-
-    func createDNSDomain(_ domain: String) async throws {
-        try await Task.sleep(for: .milliseconds(400))
-        mutate { if !$0.dnsDomainList.contains(domain) { $0.dnsDomainList.append(domain) } }
+    func exec(id: String, command: [String]) async throws {
+        // Demo: nessun container reale, l'iniezione hosts è un no-op.
     }
 
     func logs(id: String, follow: Bool, lines: Int) -> AsyncThrowingStream<String, Error> {

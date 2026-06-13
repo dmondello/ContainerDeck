@@ -130,10 +130,6 @@ struct NewContainerSpec {
     var cpus: String = ""
     /// Stringa passata a --memory (es. "512M", "2G").
     var memory: String = ""
-    /// Dominio DNS locale per il service discovery (feature Stacks):
-    /// imposta --dns-domain e --dns-search così i servizi si risolvono
-    /// per nome. nil per i container creati a mano.
-    var dnsDomain: String?
 
     var arguments: [String] {
         var args = ["run", "--detach"]
@@ -146,9 +142,6 @@ struct NewContainerSpec {
         for line in ports.lines { args += ["--publish", line] }
         for line in env.lines { args += ["--env", line] }
         for line in volumes.lines { args += ["--volume", line] }
-        if let dnsDomain, !dnsDomain.isEmpty {
-            args += ["--dns-domain", dnsDomain, "--dns-search", dnsDomain]
-        }
         args.append(image.trimmingCharacters(in: .whitespaces))
         let command = command.trimmingCharacters(in: .whitespaces)
         if !command.isEmpty {

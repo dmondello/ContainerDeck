@@ -27,9 +27,6 @@ struct ComposeService: Identifiable, Hashable {
     func containerName(project: String) -> String { name }
     func buildTag(project: String) -> String { "\(project)-\(name):latest" }
 
-    /// Nome qualificato risolvibile dall'host quando il dominio DNS esiste.
-    func fqdn(domain: String) -> String { "\(name).\(domain)" }
-
     /// Etichetta dell'origine mostrata in UI.
     var sourceLabel: String {
         if let image { return image }

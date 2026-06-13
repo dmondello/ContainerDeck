@@ -237,24 +237,15 @@ extension Localizer {
         "Avvio interrotto: i servizi dipendenti non sono stati avviati.":
             "Startup aborted: dependent services were not started.",
 
-        // Service discovery (DNS)
-        "Indirizzo": "Address",
+        // Service discovery (/etc/hosts)
+        "Raggiungibile come": "Reachable as",
         "Nome con cui gli altri servizi raggiungono questo container":
             "The name other services use to reach this container",
-        "Discovery: %@": "Discovery: %@",
-        "I servizi si raggiungono per nome su questo dominio DNS locale":
-            "Services reach each other by name on this local DNS domain",
-        "Dominio DNS service discovery": "Service discovery DNS domain",
-        "I servizi di uno stack si raggiungono per nome su questo dominio (es. db, http://superset:8088). Creato al primo avvio di uno stack con la password di amministratore.":
-            "Services in a stack reach each other by name on this domain (e.g. db, http://superset:8088). Created on first stack start with the administrator password.",
-        "Service discovery attivo sul dominio %@": "Service discovery active on domain %@",
-        "Creazione dominio DNS %@ (richiede la password di amministratore)…":
-            "Creating DNS domain %@ (requires the administrator password)…",
-        "Dominio %@ creato: i servizi si risolvono per nome":
-            "Domain %@ created: services resolve by name",
-        "⚠️ Service discovery non attivato (prompt annullato): i servizi non si raggiungeranno per nome.":
-            "⚠️ Service discovery not enabled (prompt cancelled): services won't reach each other by name.",
-        "⚠️ Service discovery non disponibile: i servizi non si raggiungeranno per nome.":
-            "⚠️ Service discovery unavailable: services won't reach each other by name."
+        "Discovery per nome": "Name discovery",
+        "All'avvio i servizi vengono resi raggiungibili per nome via /etc/hosts":
+            "On start, services are made reachable by name via /etc/hosts",
+        "Configurazione service discovery (/etc/hosts)…":
+            "Wiring service discovery (/etc/hosts)…",
+        "Service discovery attivo: %@": "Service discovery active: %@"
     ]
 }

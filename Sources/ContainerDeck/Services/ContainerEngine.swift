@@ -28,11 +28,9 @@ protocol ContainerEngine: Sendable {
     func createVolume(_ name: String) async throws
     func deleteVolume(_ name: String) async throws
 
-    /// Domini DNS locali esistenti (`container system dns list`).
-    func dnsDomains() async throws -> [String]
-    /// Crea un dominio DNS locale per il service discovery degli stack.
-    /// Richiede privilegi admin: mostra il prompt password di macOS.
-    func createDNSDomain(_ domain: String) async throws
+    /// Esegue un comando dentro un container in esecuzione (`container exec`).
+    /// Usato per il service discovery: iniezione di voci in /etc/hosts.
+    func exec(id: String, command: [String]) async throws
 
     func logs(id: String, follow: Bool, lines: Int) -> AsyncThrowingStream<String, Error>
     /// Comando da eseguire in Terminale per aprire una shell nel container.
@@ -171,17 +169,8 @@ struct ContainerCLIService: ContainerEngine {
         _ = try await run(["volume", "delete", name])
     }
 
-    func dnsDomains() async throws -> [String] {
-        let output = try await run(["system", "dns", "list"])
-        return output
-            .components(separatedBy: .newlines)
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty && $0.uppercased() != "DOMAIN" }
-    }
-
-    func createDNSDomain(_ domain: String) async throws {
-        // `system dns create` scrive in /etc/resolver → serve admin.
-        try await PrivilegedRunner.run(command: "\(binaryPath) system dns create \(domain)")
+    func exec(id: String, command: [String]) async throws {
+        _ = try await run(["exec", id] + command)
     }
 
     // MARK: Log e shell
