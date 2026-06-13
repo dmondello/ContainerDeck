@@ -101,17 +101,11 @@ struct NetworksView: View {
         } message: {
             Text(error ?? "")
         }
-        .confirmationDialog(
-            LF("Eliminare la rete “%@”?", networkToDelete?.id ?? ""),
-            isPresented: Binding(
-                get: { networkToDelete != nil }, set: { if !$0 { networkToDelete = nil } }
-            )
-        ) {
-            Button(L("Elimina"), role: .destructive) {
-                if let network = networkToDelete {
-                    Task { await appState.deleteNetwork(network.id) }
-                }
-            }
+        .deleteConfirmation($networkToDelete,
+            title: { LF("Eliminare la rete “%@”?", $0.id) },
+            message: L("L'operazione non è reversibile.")
+        ) { network in
+            Task { await appState.deleteNetwork(network.id) }
         }
     }
 }

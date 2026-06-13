@@ -251,6 +251,33 @@ struct ErrorBanner: View {
     }
 }
 
+extension View {
+    /// Dialogo di conferma distruttiva riusabile, legato a un elemento
+    /// opzionale: si presenta quando `item` è non-nil e lo azzera alla
+    /// chiusura. Evita di ripetere lo stesso `confirmationDialog` in ogni
+    /// vista che elimina qualcosa.
+    func deleteConfirmation<Item: Identifiable>(
+        _ item: Binding<Item?>,
+        title: @escaping (Item) -> String,
+        message: String,
+        onDelete: @escaping (Item) -> Void
+    ) -> some View {
+        confirmationDialog(
+            item.wrappedValue.map(title) ?? "",
+            isPresented: Binding(
+                get: { item.wrappedValue != nil },
+                set: { if !$0 { item.wrappedValue = nil } }
+            )
+        ) {
+            Button(L("Elimina"), role: .destructive) {
+                if let value = item.wrappedValue { onDelete(value) }
+            }
+        } message: {
+            Text(message)
+        }
+    }
+}
+
 /// Stato vuoto riusabile per liste senza elementi.
 struct EmptyStateView: View {
     let icon: String

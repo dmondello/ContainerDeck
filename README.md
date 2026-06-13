@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.5.1-blue)
+![status](https://img.shields.io/badge/version-0.5.2-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## Download
@@ -166,7 +166,8 @@ Sources/ContainerDeck/
 │   ├── Localization.swift      In-app language switching (EN default / IT)
 │   └── TerminalLauncher.swift  Opens interactive shells in Terminal.app
 ├── State/
-│   └── AppState.swift          Observable state, polling, actions
+│   ├── AppState.swift          Observable state, polling, actions
+│   └── AppState+Stacks.swift   Stack orchestration (load/up/stop/down)
 ├── Testing/
 │   └── SelfTests.swift         Dependency-free test suite (--run-tests)
 └── Views/

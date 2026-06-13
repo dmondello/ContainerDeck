@@ -4,6 +4,16 @@ All notable changes to ContainerDeck are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning while pre-1.0.
 
+## [0.5.2] — 2026-06-13
+
+### Changed
+- Codebase cleanup (no behavior change): removed the never-dispatched
+  `kill` action chain, two orphaned localization keys and the unused
+  `DeckNetwork.plugin` property; factored the seven near-identical delete
+  dialogs into one reusable `.deleteConfirmation` modifier; and split the
+  Stack orchestration out of `AppState` into `AppState+Stacks.swift`
+  (`AppState` 452 → 280 lines). 56 tests still green.
+
 ## [0.5.1] — 2026-06-13
 
 ### Fixed
@@ -93,6 +103,7 @@ semantic-ish versioning while pre-1.0.
 - English/Italian interface with live switching, light/dark theme, Demo mode.
 - App icon, Makefile targets for `.app` bundle and DMG packaging.
 
+[0.5.2]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.2
 [0.5.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.1
 [0.5.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.0
 [0.4.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.1

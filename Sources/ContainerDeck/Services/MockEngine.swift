@@ -99,7 +99,6 @@ final class MockEngine: ContainerEngine, @unchecked Sendable {
 
     func start(_ id: String) async throws { setState(id, .running) }
     func stop(_ id: String) async throws { setState(id, .stopped) }
-    func kill(_ id: String) async throws { setState(id, .stopped) }
 
     func delete(_ id: String, force: Bool) async throws {
         mutate { $0.containers.removeAll { $0.id == id } }

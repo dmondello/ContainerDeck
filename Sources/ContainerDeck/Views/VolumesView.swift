@@ -95,20 +95,11 @@ struct VolumesView: View {
         } message: {
             Text(error ?? "")
         }
-        .confirmationDialog(
-            LF("Eliminare il volume “%@”?", volumeToDelete?.name ?? ""),
-            isPresented: Binding(
-                get: { volumeToDelete != nil },
-                set: { if !$0 { volumeToDelete = nil } }
-            )
-        ) {
-            Button(L("Elimina"), role: .destructive) {
-                if let volume = volumeToDelete {
-                    Task { await appState.deleteVolume(volume.name) }
-                }
-            }
-        } message: {
-            Text(L("I dati contenuti nel volume andranno persi."))
+        .deleteConfirmation($volumeToDelete,
+            title: { LF("Eliminare il volume “%@”?", $0.name) },
+            message: L("I dati contenuti nel volume andranno persi.")
+        ) { volume in
+            Task { await appState.deleteVolume(volume.name) }
         }
     }
 }

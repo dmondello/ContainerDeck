@@ -63,20 +63,11 @@ struct ContainersListView: View {
         .sheet(isPresented: $showCreateSheet) {
             CreateContainerSheet().environment(appState)
         }
-        .confirmationDialog(
-            LF("Eliminare il container “%@”?", containerToDelete?.id ?? ""),
-            isPresented: Binding(
-                get: { containerToDelete != nil },
-                set: { if !$0 { containerToDelete = nil } }
-            )
-        ) {
-            Button(L("Elimina"), role: .destructive) {
-                if let container = containerToDelete {
-                    Task { await appState.perform(.delete, on: container.id) }
-                }
-            }
-        } message: {
-            Text(L("L'operazione non è reversibile."))
+        .deleteConfirmation($containerToDelete,
+            title: { LF("Eliminare il container “%@”?", $0.id) },
+            message: L("L'operazione non è reversibile.")
+        ) { container in
+            Task { await appState.perform(.delete, on: container.id) }
         }
     }
 

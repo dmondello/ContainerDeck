@@ -6,7 +6,6 @@ import Foundation
 struct DeckNetwork: Identifiable, Hashable {
     var id: String
     var mode: String?
-    var plugin: String?
     var subnet: String?
     var gateway: String?
     /// Reti built-in (es. "default") non sono eliminabili.
@@ -16,7 +15,6 @@ struct DeckNetwork: Identifiable, Hashable {
         let j = JSONExtract(record)
         id = j.string("configuration.name") ?? j.string("id") ?? "—"
         mode = j.string("configuration.mode")
-        plugin = j.string("configuration.plugin")
         subnet = j.string("status.ipv4Subnet") ?? j.string("configuration.subnet")
         gateway = j.string("status.ipv4Gateway")
         isBuiltin = j.string("configuration.labels.com.apple.container.resource.role") == "builtin"

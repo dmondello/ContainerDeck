@@ -54,7 +54,7 @@ struct ContainerStats: Identifiable {
 }
 
 enum ContainerAction: String {
-    case start, stop, restart, kill, delete
+    case start, stop, restart, delete
 }
 
 /// Formattazione condivisa per byte e percentuali.

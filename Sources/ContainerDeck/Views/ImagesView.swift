@@ -109,18 +109,11 @@ struct ImagesView: View {
         .sheet(item: $imageForNewContainer) { image in
             CreateContainerSheet(imageReference: image.reference).environment(appState)
         }
-        .confirmationDialog(
-            LF("Eliminare l'immagine “%@”?", imageToDelete?.reference ?? ""),
-            isPresented: Binding(
-                get: { imageToDelete != nil },
-                set: { if !$0 { imageToDelete = nil } }
-            )
-        ) {
-            Button(L("Elimina"), role: .destructive) {
-                if let image = imageToDelete {
-                    Task { await appState.deleteImage(image.reference) }
-                }
-            }
+        .deleteConfirmation($imageToDelete,
+            title: { LF("Eliminare l'immagine “%@”?", $0.reference) },
+            message: L("L'operazione non è reversibile.")
+        ) { image in
+            Task { await appState.deleteImage(image.reference) }
         }
     }
 }

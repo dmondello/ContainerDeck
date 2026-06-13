@@ -17,7 +17,6 @@ protocol ContainerEngine: Sendable {
 
     func start(_ id: String) async throws
     func stop(_ id: String) async throws
-    func kill(_ id: String) async throws
     func delete(_ id: String, force: Bool) async throws
     func run(spec: NewContainerSpec) async throws
 
@@ -132,7 +131,6 @@ struct ContainerCLIService: ContainerEngine {
 
     func start(_ id: String) async throws { _ = try await run(["start", id]) }
     func stop(_ id: String) async throws { _ = try await run(["stop", id]) }
-    func kill(_ id: String) async throws { _ = try await run(["kill", id]) }
 
     func delete(_ id: String, force: Bool) async throws {
         var args = ["delete", id]
