@@ -19,8 +19,16 @@ struct ComposeService: Identifiable, Hashable {
 
     var id: String { name }
 
-    func containerName(project: String) -> String { "\(project)-\(name)" }
+    /// Il container ID è il nome di servizio PURO (non prefissato col
+    /// progetto): è ciò che il DNS locale registra come `<nome>.<dominio>`,
+    /// e ciò a cui puntano le reference nel compose (es. `@db`,
+    /// `http://superset:8088`). Conseguenza: i nomi di servizio devono
+    /// essere unici tra gli stack in esecuzione contemporaneamente.
+    func containerName(project: String) -> String { name }
     func buildTag(project: String) -> String { "\(project)-\(name):latest" }
+
+    /// Nome qualificato risolvibile dall'host quando il dominio DNS esiste.
+    func fqdn(domain: String) -> String { "\(name).\(domain)" }
 
     /// Etichetta dell'origine mostrata in UI.
     var sourceLabel: String {

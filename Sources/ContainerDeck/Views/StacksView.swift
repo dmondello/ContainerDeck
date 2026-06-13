@@ -93,6 +93,10 @@ struct StacksView: View {
                     .truncationMode(.middle)
             }
             Spacer()
+            Label(LF("Discovery: %@", appState.stackDNSDomain), systemImage: "network")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .help(L("I servizi si raggiungono per nome su questo dominio DNS locale"))
             if appState.isStackBusy {
                 ProgressView().controlSize(.small)
             }
@@ -123,12 +127,13 @@ struct StacksView: View {
             }
             .width(min: 200)
 
-            TableColumn(L("Nome container")) { service in
-                Text(service.containerName(project: stack.name))
+            TableColumn(L("Indirizzo")) { service in
+                Text(service.fqdn(domain: appState.stackDNSDomain))
                     .font(.caption.monospaced())
                     .foregroundStyle(.secondary)
+                    .help(L("Nome con cui gli altri servizi raggiungono questo container"))
             }
-            .width(min: 140)
+            .width(min: 160)
 
             TableColumn(L("Stato")) { service in
                 if let state = appState.stackServiceState(service) {

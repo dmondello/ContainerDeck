@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.2.0-blue)
+![status](https://img.shields.io/badge/version-0.3.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## ContainerDeck vs Docker Desktop
@@ -52,10 +52,16 @@ it on the runtime:
 - **Ignored with a warning**: `restart` and `healthcheck` (not supported by
   the runtime), system socket mounts like `/var/run/docker.sock` (does not
   exist on apple/container), mount options such as `:ro`.
-- **Service discovery caveat**: containers don't resolve each other by
-  service name out of the box — each container gets a dedicated IP instead.
-  Use `container system dns create` for name resolution, or point services
-  at container IPs.
+- **Service discovery is built in**: on apple/container containers don't
+  resolve each other by name out of the box. On stack start ContainerDeck
+  ensures a local DNS domain (default `containerdeck.test`, configurable in
+  Settings) via `container system dns create` — a native macOS password
+  prompt appears the first time — and runs each container with
+  `--dns-domain`/`--dns-search`. Services are then reachable by their plain
+  name (`db`, `http://superset:8088`) exactly as the compose file expects.
+  Because container IDs are global, **service names must be unique across
+  stacks running at the same time**. If the prompt is cancelled the stack
+  still starts, with a warning that name resolution is off.
 - Up / Stop / Tear down from the toolbar; tear down keeps named volumes.
 
 ## Requirements
@@ -115,6 +121,7 @@ Sources/ContainerDeck/
 │   ├── ContainerEngine.swift   Protocol + real CLI implementation
 │   ├── MockEngine.swift        Demo engine (explore the UI without a runtime)
 │   ├── CommandRunner.swift     Async Process (one-shot run + streaming)
+│   ├── PrivilegedRunner.swift  Admin-prompt runner (DNS domain creation)
 │   ├── JSONExtract.swift       Tolerant access to the CLI's JSON
 │   ├── Localization.swift      In-app language switching (EN default / IT)
 │   └── TerminalLauncher.swift  Opens interactive shells in Terminal.app

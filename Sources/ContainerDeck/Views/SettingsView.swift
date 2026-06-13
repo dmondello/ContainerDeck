@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage(AppState.pollIntervalKey) private var pollInterval = 5.0
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(AppState.mockDefaultsKey) private var useMock = false
+    @AppStorage(AppState.dnsDomainKey) private var dnsDomain = "containerdeck.test"
 
     @State private var diagnostics = ""
     @State private var runningDiagnostics = false
@@ -48,6 +49,17 @@ struct SettingsView: View {
                     .onChange(of: useMock) { _, _ in
                         Task { await appState.refreshAll() }
                     }
+            }
+
+            Section(L("Stack")) {
+                HStack {
+                    TextField(L("Dominio DNS service discovery"), text: $dnsDomain,
+                              prompt: Text("containerdeck.test"))
+                        .font(.callout.monospaced())
+                }
+                Text(L("I servizi di uno stack si raggiungono per nome su questo dominio (es. db, http://superset:8088). Creato al primo avvio di uno stack con la password di amministratore."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section(L("Interfaccia")) {
@@ -104,7 +116,7 @@ struct SettingsView: View {
             }
 
             Section(L("Informazioni")) {
-                LabeledContent(L("Versione app"), value: "0.2.0")
+                LabeledContent(L("Versione app"), value: "0.3.0")
                 LabeledContent(L("Progetto runtime")) {
                     Link("github.com/apple/container",
                          destination: URL(string: "https://github.com/apple/container")!)

@@ -242,6 +242,14 @@ final class AppState {
     var isStackBusy = false
 
     static let lastStackPathKey = "lastStackPath"
+    static let dnsDomainKey = "stackDNSDomain"
+
+    /// Dominio DNS locale usato per il service discovery degli stack.
+    var stackDNSDomain: String {
+        let stored = UserDefaults.standard.string(forKey: Self.dnsDomainKey)
+        let trimmed = stored?.trimmingCharacters(in: .whitespaces) ?? ""
+        return trimmed.isEmpty ? "containerdeck.test" : trimmed
+    }
 
     private func slog(_ message: String) {
         stackLog.append(message)
@@ -278,6 +286,9 @@ final class AppState {
     /// Avvia lo stack: volumi → build → run/start in ordine di depends_on.
     /// Niente attese su healthcheck (non supportati): tra un servizio e il
     /// successivo c'è solo una breve pausa.
+    /// Indica se il service discovery è attivo per l'ultimo avvio.
+    var stackDiscoveryActive = false
+
     func stackUp() async {
         guard let stack, !isStackBusy else { return }
         isStackBusy = true
@@ -285,6 +296,13 @@ final class AppState {
         slog(LF("Avvio dello stack “%@”…", stack.name))
 
         let engine = engine
+        let domain = stackDNSDomain
+
+        // Service discovery: assicura il dominio DNS locale prima di avviare,
+        // così i servizi si risolvono per nome (es. backend → db). Senza,
+        // i container partono ma non si raggiungono per nome.
+        stackDiscoveryActive = await ensureDNSDomain(domain, engine: engine)
+
         for volume in stack.volumes {
             if volumes.contains(where: { $0.name == volume }) {
                 slog(LF("Volume %@ già presente", volume))
@@ -322,9 +340,11 @@ final class AppState {
                     spec.ports = service.ports.joined(separator: "\n")
                     spec.env = service.env.joined(separator: "\n")
                     spec.volumes = service.volumes.joined(separator: "\n")
+                    if stackDiscoveryActive { spec.dnsDomain = domain }
                     try await engine.run(spec: spec)
                 }
-                slog("✓ \(service.name)")
+                let reachable = stackDiscoveryActive ? " → \(service.fqdn(domain: domain))" : ""
+                slog("✓ \(service.name)\(reachable)")
                 try? await Task.sleep(for: .seconds(1))
             } catch {
                 slog("✗ \(service.name): \(error.localizedDescription)")
@@ -333,6 +353,30 @@ final class AppState {
             }
         }
         await refreshAll()
+    }
+
+    /// Garantisce l'esistenza del dominio DNS locale per il discovery.
+    /// Ritorna true se il dominio è disponibile, false se l'utente annulla
+    /// il prompt admin o la creazione fallisce (lo stack parte comunque,
+    /// ma senza risoluzione per nome).
+    private func ensureDNSDomain(_ domain: String, engine: ContainerEngine) async -> Bool {
+        if let existing = try? await engine.dnsDomains(), existing.contains(domain) {
+            slog(LF("Service discovery attivo sul dominio %@", domain))
+            return true
+        }
+        slog(LF("Creazione dominio DNS %@ (richiede la password di amministratore)…", domain))
+        do {
+            try await engine.createDNSDomain(domain)
+            slog(LF("Dominio %@ creato: i servizi si risolvono per nome", domain))
+            return true
+        } catch is PrivilegedRunner.Cancelled {
+            slog(L("⚠️ Service discovery non attivato (prompt annullato): i servizi non si raggiungeranno per nome."))
+            return false
+        } catch {
+            slog("⚠️ \(error.localizedDescription)")
+            slog(L("⚠️ Service discovery non disponibile: i servizi non si raggiungeranno per nome."))
+            return false
+        }
     }
 
     /// Ferma i container dello stack in ordine inverso di avvio.
