@@ -248,6 +248,12 @@ extension Localizer {
             "Wiring service discovery (/etc/hosts)…",
         "Service discovery attivo: %@": "Service discovery active: %@",
 
+        // Terminale integrato
+        "Shell integrata": "Built-in shell",
+        "Apri in Terminale.app": "Open in Terminal.app",
+        "Apri una shell nel container": "Open a shell in the container",
+        "Shell — %@": "Shell — %@",
+
         // Multi-log
         "Log": "Logs",
         "Log combinati": "Combined logs",

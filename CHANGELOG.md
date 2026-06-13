@@ -4,6 +4,20 @@ All notable changes to ContainerDeck are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning while pre-1.0.
 
+## [0.5.0] — 2026-06-13
+
+### Added
+- **Built-in terminal**: the container "Shell" now opens an in-app PTY
+  terminal (SwiftTerm) running `container exec`, instead of handing off to
+  Terminal.app — which remains available as a secondary option.
+
+### Changed
+- Stack service discovery (`/etc/hosts`) is re-applied automatically when a
+  stack member is restarted on its own, since its IP may change.
+
+### Dependencies
+- Added [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm).
+
 ## [0.4.1] — 2026-06-13
 
 ### Added
@@ -69,6 +83,7 @@ semantic-ish versioning while pre-1.0.
 - English/Italian interface with live switching, light/dark theme, Demo mode.
 - App icon, Makefile targets for `.app` bundle and DMG packaging.
 
+[0.5.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.0
 [0.4.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.1
 [0.4.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.0
 [0.3.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.3.0

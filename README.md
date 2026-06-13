@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.4.1-blue)
+![status](https://img.shields.io/badge/version-0.5.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## ContainerDeck vs Docker Desktop
@@ -46,8 +46,9 @@ Dashboard · containers (create / start / stop / restart / delete, detail with
 live stats, env, mounts, raw JSON) · **Stacks** (docker-compose import with
 service discovery) · images (pull / delete / create container) · volumes ·
 **networks** · **combined multi-container log viewer** (color-coded, filter,
-per-container toggle) · per-container live logs and shell · English/Italian
-with live switching · light/dark theme · Demo mode without a runtime.
+per-container toggle) · per-container live logs · **built-in terminal** (or
+hand off to Terminal.app) · English/Italian with live switching · light/dark
+theme · Demo mode without a runtime.
 
 ## Stacks: docker-compose support
 
@@ -169,6 +170,7 @@ Sources/ContainerDeck/
     ├── ContainerDetailView.swift Overview / Logs / Inspector + shell
     ├── LogViewer.swift         Live streaming, filter, copy
     ├── MultiLogView.swift      Combined logs of many containers, color-coded
+    ├── EmbeddedTerminalView.swift  In-app PTY terminal (SwiftTerm)
     ├── NetworksView.swift      List/create/delete container networks
     ├── ImagesView.swift        List + pull + delete images
     ├── VolumesView.swift       List + create + delete volumes
@@ -185,9 +187,10 @@ Principles:
   contract across releases; every field is looked up through multiple paths
   and degrades to "—" instead of breaking. The *Inspector* tab always shows
   the raw JSON for debugging.
-- **One external dependency**: [Yams](https://github.com/jpsim/Yams) for
-  YAML parsing (Stacks feature) — everything else is SwiftUI, Foundation
-  and Observation.
+- **Two external dependencies**: [Yams](https://github.com/jpsim/Yams) for
+  YAML parsing (Stacks) and [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm)
+  for the built-in terminal — everything else is SwiftUI, Foundation and
+  Observation.
 
 ## Localization
 
@@ -207,23 +210,23 @@ adding one dictionary.
   the same time, and isn't re-applied if a container is restarted on its own.
 - The CPU percentage is derived from the `cpuUsageUsec` delta between two
   samples: the first refresh after startup shows "—".
-- The integrated shell opens Terminal.app via AppleScript (requires the
-  Automation permission on first use); an embedded terminal is on the roadmap.
 - The DMG is not notarized, and there are no automatic updates yet.
+- The engine still talks to the CLI, not the native XPC API (next on the
+  roadmap).
 
 ## Roadmap
 
 Pre-1.0, focused on depth where it differentiates (Stacks, native macOS feel)
 rather than chasing full Docker Desktop parity.
 
-### 0.5 — native integration & polish
+### 0.5 — native integration & polish *(in progress)*
+- ✅ **Built-in terminal** (SwiftTerm) for `exec`, with Terminal.app as a
+  fallback.
+- ✅ Re-apply stack `/etc/hosts` wiring automatically when a service restarts.
 - Migrate the engine from the CLI to the **`ContainerAPIClient` XPC API**
   behind the existing `ContainerEngine` protocol (faster, no process spawn,
   structured errors). The protocol boundary already makes this a drop-in.
-- **Embedded terminal** (SwiftTerm) for `exec`, replacing the Terminal.app
-  hand-off.
 - **Sparkle** auto-updates with an appcast on GitHub Releases.
-- Re-apply stack `/etc/hosts` wiring automatically when a service restarts.
 
 ### 0.6 — deeper Stacks & observability
 - Wider compose coverage: `env_file`, multiple `volumes`/bind options,

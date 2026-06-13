@@ -13,6 +13,7 @@ struct ContainerDetailView: View {
     }
 
     @State private var tab: Tab = .overview
+    @State private var showTerminal = false
 
     private var container: DeckContainer? {
         appState.containers.first { $0.id == containerID }
@@ -57,16 +58,29 @@ struct ContainerDetailView: View {
                 .lineLimit(1)
             Spacer()
             ContainerActionButtons(container: container)
-            Button {
-                TerminalLauncher.run(command: appState.engine.shellCommand(id: container.id))
+            Menu {
+                Button {
+                    showTerminal = true
+                } label: {
+                    Label(L("Shell integrata"), systemImage: "terminal")
+                }
+                Button {
+                    TerminalLauncher.run(command: appState.engine.shellCommand(id: container.id))
+                } label: {
+                    Label(L("Apri in Terminale.app"), systemImage: "macwindow")
+                }
             } label: {
                 Label("Shell", systemImage: "terminal")
             }
+            .menuStyle(.button)
             .disabled(container.state != .running)
-            .help(L("Apri una shell nel container usando Terminale"))
+            .help(L("Apri una shell nel container"))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .sheet(isPresented: $showTerminal) {
+            ContainerTerminalSheet(containerID: container.id)
+        }
     }
 
     private func overview(_ container: DeckContainer) -> some View {

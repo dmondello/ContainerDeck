@@ -149,6 +149,15 @@ final class AppState {
             lastError = error.localizedDescription
         }
         await refreshAll()
+
+        // Se il container riavviato/avviato appartiene allo stack caricato, il
+        // suo IP può essere cambiato: ricablare il service discovery così le
+        // voci /etc/hosts degli altri servizi restano valide.
+        if action == .restart || action == .start,
+           let stack, stack.services.contains(where: { $0.containerName(project: stack.name) == id }) {
+            await wireServiceDiscovery(stack, engine: engine)
+            await refreshAll()
+        }
     }
 
     func createContainer(_ spec: NewContainerSpec) async throws {
