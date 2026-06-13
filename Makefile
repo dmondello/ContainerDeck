@@ -16,13 +16,18 @@ DMG_STAGING = $(DIST_DIR)/dmg-staging
 #     --apple-id <email> --team-id <TEAMID> --password <app-specific-password>
 NOTARY_PROFILE ?= containerdeck-notary
 
-.PHONY: build run app dmg notarize clean
+.PHONY: build run test app dmg notarize clean
 
 build:
 	swift build -c release --arch arm64
 
 run:
 	swift run
+
+# Suite di test autonoma (nessun Xcode richiesto): l'eseguibile gira le
+# asserzioni con --run-tests e ritorna un exit code non-zero se fallisce.
+test:
+	swift run ContainerDeck --run-tests
 
 app: build
 	rm -rf $(APP_BUNDLE)

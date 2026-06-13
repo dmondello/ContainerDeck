@@ -5,6 +5,11 @@ struct ContainerDeckApp: App {
     @State private var appState = AppState()
 
     init() {
+        // Suite di test autonoma: `ContainerDeck --run-tests` (vedi `make test`).
+        if CommandLine.arguments.contains("--run-tests") {
+            exit(SelfTests.run() ? 0 : 1)
+        }
+
         // Hook diagnostico: `ContainerDeck --parse-compose <file>` stampa
         // il risultato del parsing compose senza avviare la UI.
         if let flag = CommandLine.arguments.firstIndex(of: "--parse-compose"),

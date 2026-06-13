@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.4.0-blue)
+![status](https://img.shields.io/badge/version-0.4.1-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## ContainerDeck vs Docker Desktop
@@ -98,7 +98,28 @@ cp -r dist/ContainerDeck.app /Applications/
 
 # Or: disk image for distribution (drag-and-drop to Applications)
 make dmg     # → dist/ContainerDeck-<version>.dmg
+
+# Run the test suite
+make test
 ```
+
+## Testing
+
+The test suite is **dependency-free** and runs with the Command Line Tools
+alone — no Xcode, no XCTest. It is a self-contained harness
+(`Sources/ContainerDeck/Testing/SelfTests.swift`) invoked through the
+executable's `--run-tests` flag and exits non-zero on any failure, so it
+slots straight into CI:
+
+```sh
+make test          # or: swift run ContainerDeck --run-tests
+```
+
+It covers the pure logic where regressions hurt most: tolerant JSON access,
+the model mappings against the real CLI 1.0.0 schema (container/image/volume/
+network/stats), `run` argument generation, and the compose parser
+(interpolation, `depends_on` ordering, bare service names, build-context
+resolution, skipped-mount warnings).
 
 ## Installing the DMG
 
@@ -138,6 +159,8 @@ Sources/ContainerDeck/
 │   └── TerminalLauncher.swift  Opens interactive shells in Terminal.app
 ├── State/
 │   └── AppState.swift          Observable state, polling, actions
+├── Testing/
+│   └── SelfTests.swift         Dependency-free test suite (--run-tests)
 └── Views/
     ├── MainWindow.swift        NavigationSplitView + sidebar + engine status
     ├── DashboardView.swift     Summary cards, error/engine banners

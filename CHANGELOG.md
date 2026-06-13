@@ -4,6 +4,14 @@ All notable changes to ContainerDeck are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning while pre-1.0.
 
+## [0.4.1] — 2026-06-13
+
+### Added
+- **Dependency-free test suite** (56 assertions) runnable with the Command
+  Line Tools alone via `make test` / `ContainerDeck --run-tests`, exiting
+  non-zero on failure. Covers JSON access, model mappings against the CLI
+  1.0.0 schema, run-argument generation, and the compose parser.
+
 ## [0.4.0] — 2026-06-13
 
 ### Added
@@ -61,6 +69,7 @@ semantic-ish versioning while pre-1.0.
 - English/Italian interface with live switching, light/dark theme, Demo mode.
 - App icon, Makefile targets for `.app` bundle and DMG packaging.
 
+[0.4.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.1
 [0.4.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.4.0
 [0.3.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.3.0
 [0.2.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.2.0
