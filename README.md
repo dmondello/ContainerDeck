@@ -7,6 +7,13 @@ Swift + SwiftUI — no Electron, no external runtimes.
 ![status](https://img.shields.io/badge/version-0.5.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
+## Download
+
+Grab the latest signed-ad-hoc DMG from the
+[**Releases**](https://github.com/dmondello/ContainerDeck/releases/latest) page,
+or build from source (see below). First launch needs one Gatekeeper step —
+see [Installing the DMG](#installing-the-dmg).
+
 ## ContainerDeck vs Docker Desktop
 
 ![Docker Desktop vs ContainerDeck architecture](docs/architecture.png)
@@ -25,7 +32,7 @@ Apple Silicon.
 | Idle footprint | GBs of reserved RAM | ~zero |
 | Isolation | shared kernel across containers | one kernel per container |
 | Networking | port-forwarding from the VM | dedicated IP per container |
-| App size | ~1.5 GB (Electron) | ~2.5 MB DMG (native SwiftUI) |
+| App size | ~1.5 GB (Electron) | ~4 MB DMG (native SwiftUI) |
 | Licensing | paid above company thresholds | open source + free app |
 | Account/telemetry | required/present | none |
 | Images | OCI (Docker Hub, GHCR…) | OCI (the same images) |
@@ -207,7 +214,7 @@ adding one dictionary.
 - **Stacks** cover a subset of compose (see above); `restart`, `healthcheck`,
   profiles and per-stack networks are not handled. Service discovery via
   `/etc/hosts` requires service names to be unique across stacks running at
-  the same time, and isn't re-applied if a container is restarted on its own.
+  the same time.
 - The CPU percentage is derived from the `cpuUsageUsec` delta between two
   samples: the first refresh after startup shows "—".
 - The DMG is not notarized, and there are no automatic updates yet.
