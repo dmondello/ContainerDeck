@@ -39,6 +39,7 @@ enum SelfTests {
         newContainerSpec(r)
         composeInterpolation(r)
         composeParser(r)
+        composeEnvFileAndProfiles(r)
 
         print("")
         if r.failed == 0 {
@@ -226,6 +227,51 @@ enum SelfTests {
     volumes:
       postgres_data:
     """
+
+    // MARK: Compose env_file + profiles
+
+    private static let composeEnvProfilesYAML = """
+    services:
+      db:
+        image: postgres:15
+        env_file: db.env
+        environment:
+          - POSTGRES_DB=override
+      tools:
+        image: busybox
+        profiles:
+          - debug
+    """
+
+    private static func composeEnvFileAndProfiles(_ r: Reporter) {
+        r.suite("ComposeEnvProfiles")
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("cdenv-\(UInt64.random(in: 0..<UInt64.max))")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        do {
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            try "POSTGRES_DB=fromfile\nPOSTGRES_USER=alice\n# commento\n"
+                .write(to: dir.appendingPathComponent("db.env"), atomically: true, encoding: .utf8)
+            try composeEnvProfilesYAML
+                .write(to: dir.appendingPathComponent("docker-compose.yml"), atomically: true, encoding: .utf8)
+            let stack = try ComposeParser.load(path: dir.appendingPathComponent("docker-compose.yml").path)
+
+            let db = stack.services.first { $0.name == "db" }!
+            // env_file fornisce POSTGRES_USER; environment sovrascrive POSTGRES_DB.
+            r.check(db.env.contains("POSTGRES_USER=alice"), "env_file loaded")
+            r.check(db.env.contains("POSTGRES_DB=override"), "environment overrides env_file")
+            r.check(!db.env.contains("POSTGRES_DB=fromfile"), "no stale env_file value")
+
+            // Profili
+            r.eq(stack.allProfiles, ["debug"], "profiles discovered")
+            let tools = stack.services.first { $0.name == "tools" }!
+            r.check(!tools.isEnabled(activeProfiles: []), "profiled service off by default")
+            r.check(tools.isEnabled(activeProfiles: ["debug"]), "profiled service on when active")
+            r.check(db.isEnabled(activeProfiles: []), "unprofiled service always on")
+        } catch {
+            r.check(false, "env/profiles parse threw: \(error.localizedDescription)")
+        }
+    }
 
     private static func composeParser(_ r: Reporter) {
         r.suite("ComposeParser")

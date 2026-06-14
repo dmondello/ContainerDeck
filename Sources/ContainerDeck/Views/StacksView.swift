@@ -21,6 +21,10 @@ struct StacksView: View {
         VStack(spacing: 0) {
             if let stack = appState.stack {
                 stackHeader(stack)
+                if !stack.allProfiles.isEmpty {
+                    Divider()
+                    profilesBar(stack)
+                }
                 Divider()
                 servicesList(stack)
                 Divider()
@@ -131,10 +135,47 @@ struct StacksView: View {
         .padding(.vertical, 12)
     }
 
+    /// Barra dei profili compose: chip attivabili che decidono quali servizi
+    /// partiranno al prossimo "Avvia stack".
+    private func profilesBar(_ stack: ComposeStack) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "slider.horizontal.3").foregroundStyle(.secondary)
+            Text(L("Profili")).font(.caption).foregroundStyle(.secondary)
+            ForEach(stack.allProfiles, id: \.self) { profile in
+                let active = appState.activeStackProfiles.contains(profile)
+                Button {
+                    if active { appState.activeStackProfiles.remove(profile) }
+                    else { appState.activeStackProfiles.insert(profile) }
+                } label: {
+                    Text(profile)
+                        .font(.caption.weight(.medium))
+                        .padding(.horizontal, 9).padding(.vertical, 3)
+                        .background((active ? Color.teal : .gray).opacity(active ? 0.2 : 0.12), in: Capsule())
+                        .foregroundStyle(active ? .teal : .secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 7)
+    }
+
     private func servicesList(_ stack: ComposeStack) -> some View {
         Table(stack.services) {
             TableColumn(L("Servizio")) { service in
-                Text(service.name).font(.callout.weight(.medium))
+                HStack(spacing: 6) {
+                    Text(service.name).font(.callout.weight(.medium))
+                    if !service.isEnabled(activeProfiles: appState.activeStackProfiles) {
+                        Text(service.profiles.joined(separator: ","))
+                            .font(.caption2)
+                            .padding(.horizontal, 5).padding(.vertical, 1)
+                            .background(.gray.opacity(0.15), in: Capsule())
+                            .foregroundStyle(.tertiary)
+                            .help(L("Escluso: profilo non attivo"))
+                    }
+                }
+                .opacity(service.isEnabled(activeProfiles: appState.activeStackProfiles) ? 1 : 0.5)
             }
             .width(min: 120)
 

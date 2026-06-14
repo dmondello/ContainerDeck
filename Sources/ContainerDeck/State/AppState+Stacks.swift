@@ -14,6 +14,7 @@ extension AppState {
         do {
             stack = try ComposeParser.load(path: path)
             stackLog = []
+            activeStackProfiles = []
             UserDefaults.standard.set(path, forKey: Self.lastStackPathKey)
             for warning in stack?.warnings ?? [] {
                 slog("⚠️ \(warning)")
@@ -62,7 +63,14 @@ extension AppState {
             }
         }
 
-        for service in stack.services {
+        // Profili: solo i servizi abilitati partono (gli altri sono annotati).
+        let enabled = stack.services.filter { $0.isEnabled(activeProfiles: activeStackProfiles) }
+        let skipped = stack.services.count - enabled.count
+        if skipped > 0 {
+            slog(LF("%d servizi esclusi dai profili attivi", skipped))
+        }
+
+        for service in enabled {
             let containerName = service.containerName(project: stack.name)
             do {
                 var imageRef = service.image

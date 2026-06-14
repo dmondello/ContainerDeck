@@ -4,6 +4,21 @@ All notable changes to ContainerDeck are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/), and the project follows
 semantic-ish versioning while pre-1.0.
 
+## [0.6.0] — 2026-06-14
+
+### Added
+- **Stacks: `env_file` support** — a service can load one or more env files
+  (resolved relative to the compose file); inline `environment` overrides
+  them. Missing files are skipped with a warning.
+- **Stacks: `profiles` support** — services tagged with profiles are toggled
+  from a new chip bar in the stack view; only enabled services (no profile,
+  or an active profile) are started. Excluded services are shown dimmed.
+
+### Notes
+- The remaining 0.5 items (native XPC engine, Sparkle) are parked as spikes:
+  both have cores that can't be verified without a signed build / entitlements,
+  so they're deferred rather than shipped half-working. See the roadmap.
+
 ## [0.5.2] — 2026-06-13
 
 ### Changed
@@ -103,6 +118,7 @@ semantic-ish versioning while pre-1.0.
 - English/Italian interface with live switching, light/dark theme, Demo mode.
 - App icon, Makefile targets for `.app` bundle and DMG packaging.
 
+[0.6.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.6.0
 [0.5.2]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.2
 [0.5.1]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.1
 [0.5.0]: https://github.com/dmondello/ContainerDeck/releases/tag/v0.5.0

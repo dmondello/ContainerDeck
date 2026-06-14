@@ -4,7 +4,7 @@ A native macOS GUI for [apple/container](https://github.com/apple/container)
 on Apple Silicon: a lightweight Docker Desktop alternative, built with
 Swift + SwiftUI — no Electron, no external runtimes.
 
-![status](https://img.shields.io/badge/version-0.5.2-blue)
+![status](https://img.shields.io/badge/version-0.6.0-blue)
 ![platform](https://img.shields.io/badge/macOS-15%2B%20(arm64)-black)
 
 ## Download
@@ -64,9 +64,12 @@ gap. The **Stacks** section imports a `docker-compose.yml` and orchestrates
 it on the runtime:
 
 - **Supported subset**: `services` (image / build context+target+dockerfile /
-  command / ports / environment / volumes / depends_on / container_name),
-  top-level named `volumes`, `${VAR}` and `${VAR:-default}` interpolation
-  from a sibling `.env` file and the process environment.
+  command / ports / environment / `env_file` / volumes / depends_on /
+  `profiles` / container_name), top-level named `volumes`, `${VAR}` and
+  `${VAR:-default}` interpolation from a sibling `.env` file and the process
+  environment. `env_file` values are overridden by inline `environment`;
+  `profiles` are toggled in the UI before starting (services with no profile
+  always run).
 - **Start order** follows `depends_on` (topological sort); builds run through
   `container build` (BuildKit), named volumes are created on the fly.
 - **Ignored with a warning**: `restart` and `healthcheck` (not supported by
@@ -227,22 +230,29 @@ adding one dictionary.
 Pre-1.0, focused on depth where it differentiates (Stacks, native macOS feel)
 rather than chasing full Docker Desktop parity.
 
-### 0.5 — native integration & polish *(in progress)*
+### 0.5 — native integration & polish
 - ✅ **Built-in terminal** (SwiftTerm) for `exec`, with Terminal.app as a
   fallback.
 - ✅ Re-apply stack `/etc/hosts` wiring automatically when a service restarts.
-- Migrate the engine from the CLI to the **`ContainerAPIClient` XPC API**
-  behind the existing `ContainerEngine` protocol (faster, no process spawn,
-  structured errors). The protocol boundary already makes this a drop-in.
-- **Sparkle** auto-updates with an appcast on GitHub Releases.
 
-### 0.6 — deeper Stacks & observability
-- Wider compose coverage: `env_file`, multiple `volumes`/bind options,
-  per-stack network, `profiles`, a `restart`-like supervise loop.
+### 0.6 — deeper Stacks & observability *(in progress)*
+- ✅ Wider compose coverage: `env_file` (with inline-`environment` precedence)
+  and `profiles` (toggled in the UI).
+- Per-stack network, multiple bind/volume options, a `restart`-like
+  supervise loop.
 - Per-service log tab inside the stack view (reusing the multi-log engine).
 - **Historical stats** with Swift Charts + a small SQLite store (CPU / memory /
   network over time), beyond the current live snapshot.
 - Image **build from Dockerfile** with live progress, and registry search.
+
+### Deferred spikes
+- Migrate the engine from the CLI to the **`ContainerAPIClient` XPC API**
+  behind the existing `ContainerEngine` protocol. `ContainerAPIClient` is a
+  real library product (macOS 15+), but talking to the runtime over XPC needs
+  entitlements a third-party app likely lacks — this needs its own spike with
+  a signed build to verify, so it's parked rather than shipped half-working.
+- **Sparkle** auto-updates — best done together with Developer ID signing and
+  notarization (the 1.0 distribution work).
 
 ### 1.0 — a shippable product
 - **Developer ID signing + notarization** and a **Homebrew cask**

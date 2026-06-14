@@ -275,6 +275,9 @@ final class AppState {
     var stack: ComposeStack?
     var stackLog: [String] = []
     var isStackBusy = false
+    /// Profili compose attivi per lo stack corrente (vuoto = solo i servizi
+    /// senza profilo, come `docker compose up` senza `--profile`).
+    var activeStackProfiles: Set<String> = []
 
     static let lastStackPathKey = "lastStackPath"
 }

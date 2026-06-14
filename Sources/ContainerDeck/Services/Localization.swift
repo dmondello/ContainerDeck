@@ -234,6 +234,9 @@ extension Localizer {
         "Volume %@ già presente": "Volume %@ already exists",
         "Avvio interrotto: i servizi dipendenti non sono stati avviati.":
             "Startup aborted: dependent services were not started.",
+        "Profili": "Profiles",
+        "Escluso: profilo non attivo": "Excluded: profile not active",
+        "%d servizi esclusi dai profili attivi": "%d services excluded by active profiles",
 
         // Service discovery (/etc/hosts)
         "Raggiungibile come": "Reachable as",

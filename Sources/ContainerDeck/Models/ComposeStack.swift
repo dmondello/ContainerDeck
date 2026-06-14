@@ -16,8 +16,16 @@ struct ComposeService: Identifiable, Hashable {
     var env: [String] = []
     var volumes: [String] = []
     var dependsOn: [String] = []
+    /// Profili compose a cui appartiene il servizio (vuoto = sempre attivo).
+    var profiles: [String] = []
 
     var id: String { name }
+
+    /// Un servizio è abilitato se non ha profili, o se almeno uno dei suoi
+    /// profili è tra quelli attivi (semantica `docker compose --profile`).
+    func isEnabled(activeProfiles: Set<String>) -> Bool {
+        profiles.isEmpty || profiles.contains { activeProfiles.contains($0) }
+    }
 
     /// Il container ID è il nome di servizio PURO (non prefissato col
     /// progetto): è ciò che il DNS locale registra come `<nome>.<dominio>`,
@@ -47,6 +55,11 @@ struct ComposeStack {
     var services: [ComposeService]
     var volumes: [String]
     var warnings: [String]
+
+    /// Tutti i profili dichiarati nello stack, ordinati e unici.
+    var allProfiles: [String] {
+        Array(Set(services.flatMap(\.profiles))).sorted()
+    }
 }
 
 enum ComposeError: LocalizedError {
@@ -122,11 +135,34 @@ enum ComposeParser {
                 service.ports.append(p.contains(":") ? p : "\(p):\(p)")
             }
 
+            // Ambiente: prima i file `env_file` (in ordine), poi `environment`
+            // che ha la precedenza (semantica compose). Risultato deduplicato.
+            var envMap: [String: String] = [:]
+            for file in envFileList(s["env_file"]) {
+                let resolved = resolvePath(file, dir: dir)
+                if let pairs = loadEnvFile(path: resolved) {
+                    pairs.forEach { envMap[$0.key] = $0.value }
+                } else {
+                    warnings.append("\(name): env_file “\(file)” non trovato, ignorato")
+                }
+            }
             if let envList = s["environment"] as? [Any] {
-                service.env = envList.map { "\($0)" }
+                for entry in envList {
+                    let str = "\(entry)"
+                    if let eq = str.firstIndex(of: "=") {
+                        envMap[String(str[..<eq])] = String(str[str.index(after: eq)...])
+                    } else {
+                        // "KEY" senza valore → eredita dall'ambiente di processo.
+                        envMap[str] = ProcessInfo.processInfo.environment[str] ?? ""
+                    }
+                }
             } else {
-                let envMap = stringDict(s["environment"])
-                service.env = envMap.map { "\($0.key)=\($0.value)" }.sorted()
+                stringDict(s["environment"]).forEach { envMap[$0.key] = "\($0.value)" }
+            }
+            service.env = envMap.map { "\($0.key)=\($0.value)" }.sorted()
+
+            if let profiles = s["profiles"] as? [Any] {
+                service.profiles = profiles.map { "\($0)" }
             }
 
             for entry in s["volumes"] as? [Any] ?? [] {
@@ -203,6 +239,23 @@ enum ComposeParser {
         guard let text = try? String(contentsOf: dir.appendingPathComponent(".env"), encoding: .utf8) else {
             return [:]
         }
+        return parseEnvText(text)
+    }
+
+    /// `env_file` accetta una stringa singola o una lista di percorsi.
+    private static func envFileList(_ raw: Any?) -> [String] {
+        if let single = raw as? String { return [single] }
+        if let list = raw as? [Any] { return list.map { "\($0)" } }
+        return []
+    }
+
+    private static func loadEnvFile(path: String) -> [String: String]? {
+        guard let text = try? String(contentsOfFile: path, encoding: .utf8) else { return nil }
+        return parseEnvText(text)
+    }
+
+    /// Parser di un file in formato KEY=VALUE (commenti `#`, virgolette opzionali).
+    private static func parseEnvText(_ text: String) -> [String: String] {
         var env: [String: String] = [:]
         for line in text.components(separatedBy: .newlines) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
