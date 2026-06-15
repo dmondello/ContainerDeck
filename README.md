@@ -40,7 +40,7 @@ Apple Silicon.
 ContainerDeck narrows the classic gap: apple/container has no native compose,
 so the app brings its own **Stacks** (a useful docker-compose subset, with
 service discovery — see below). Where Docker Desktop is still ahead: the
-**full** Compose spec (profiles, multiple networks, build secrets…), built-in
+**full** Compose spec (multiple networks, build secrets, configs…), built-in
 Kubernetes, extensions, and ten years of maturity. apple/container is at 1.0
 and requires macOS 15+ on Apple Silicon (macOS 26 for the advanced networking
 features). The two tools coexist on the same machine without conflicts:
@@ -51,7 +51,8 @@ orchestration → Docker Desktop.
 
 Dashboard · containers (create / start / stop / restart / delete, detail with
 live stats, env, mounts, raw JSON) · **Stacks** (docker-compose import with
-service discovery) · images (pull / delete / create container) · volumes ·
+`env_file`/`profiles` and service discovery) · images (pull / delete / create
+container) · volumes ·
 **networks** · **combined multi-container log viewer** (color-coded, filter,
 per-container toggle) · per-container live logs · **built-in terminal** (or
 hand off to Terminal.app) · English/Italian with live switching · light/dark
@@ -216,9 +217,9 @@ adding one dictionary.
   native XPC API yet — see the roadmap. JSON schemas are verified against CLI
   **1.0.0**; future versions may need new fallback paths in the models.
 - **Stacks** cover a subset of compose (see above); `restart`, `healthcheck`,
-  profiles and per-stack networks are not handled. Service discovery via
-  `/etc/hosts` requires service names to be unique across stacks running at
-  the same time.
+  per-stack networks and build secrets/configs are not handled. Service
+  discovery via `/etc/hosts` requires service names to be unique across stacks
+  running at the same time.
 - The CPU percentage is derived from the `cpuUsageUsec` delta between two
   samples: the first refresh after startup shows "—".
 - The DMG is not notarized, and there are no automatic updates yet.

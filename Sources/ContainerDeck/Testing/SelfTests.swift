@@ -262,6 +262,21 @@ enum SelfTests {
             r.check(db.env.contains("POSTGRES_DB=override"), "environment overrides env_file")
             r.check(!db.env.contains("POSTGRES_DB=fromfile"), "no stale env_file value")
 
+            // env_file a lista: il secondo file vince, il mancante avvisa.
+            try "X=1\nY=1\n".write(to: dir.appendingPathComponent("a.env"), atomically: true, encoding: .utf8)
+            try "Y=2\n".write(to: dir.appendingPathComponent("b.env"), atomically: true, encoding: .utf8)
+            try """
+            services:
+              app:
+                image: alpine
+                env_file: [a.env, b.env, missing.env]
+            """.write(to: dir.appendingPathComponent("list.yml"), atomically: true, encoding: .utf8)
+            let listStack = try ComposeParser.load(path: dir.appendingPathComponent("list.yml").path)
+            let app = listStack.services.first { $0.name == "app" }!
+            r.check(app.env.contains("X=1"), "env_file list: first file applied")
+            r.check(app.env.contains("Y=2"), "env_file list: later file overrides earlier")
+            r.check(listStack.warnings.contains { $0.contains("missing.env") }, "missing env_file warns")
+
             // Profili
             r.eq(stack.allProfiles, ["debug"], "profiles discovered")
             let tools = stack.services.first { $0.name == "tools" }!
